@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <script>document.documentElement.classList.add('js');</script>
-<noscript><style>.logo-hero-img,.focus-in{opacity:1!important;filter:none!important;transform:none!important;animation:none!important;}.logo-reveal::after{display:none!important;}.logo-hero-img{filter:drop-shadow(0 24px 60px rgba(0,0,0,0.4))!important;}</style></noscript>
+<noscript><style>.logo-hero-img,.focus-in{opacity:1!important;filter:none!important;transform:none!important;animation:none!important;}.logo-hero-img{filter:drop-shadow(0 24px 60px rgba(0,0,0,0.4))!important;}</style></noscript>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Support the Mission — J-Lu Productions</title>
@@ -475,42 +475,27 @@ html.js .divider.in-view { transform: scaleX(1); }
     radial-gradient(ellipse at center, var(--navy) 0%, var(--navy-deep) 78%);
 }
 
-/* Focus-pull + light-sweep reveal for the logo mark — soft blur resolving
-   into focus, like a camera racking in, instead of a hard-edged wipe. */
+/* Smooth fade + gentle scale-in for the logo mark — no wipe, no sweep,   */
+/* nothing rectangular. Pure opacity + scale, so the logo simply         */
+/* materializes softly against the navy background. */
 .logo-reveal {
   position: relative;
   z-index: 2;
   display: inline-block;
-  overflow: hidden;
-  padding: 40px;
-  margin: -40px;
-}
-.logo-reveal::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(100deg, transparent 0%, rgba(255,255,255,0.6) 45%, var(--gold-soft) 50%, rgba(255,255,255,0.6) 55%, transparent 100%);
-  mix-blend-mode: screen;
-  transform: translateX(-130%);
-  animation: sweepAcross 1.3s cubic-bezier(0.16, 1, 0.3, 1) 1.05s forwards;
-  pointer-events: none;
-}
-@keyframes sweepAcross {
-  to { transform: translateX(130%); }
 }
 
 .logo-hero-img {
   width: min(58vw, 620px);
   height: auto;
   opacity: 0;
-  transform: scale(1.07);
-  filter: drop-shadow(0 24px 60px rgba(0, 0, 0, 0.4)) blur(22px);
-  animation: logoFocusIn 1.7s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
-  will-change: transform, opacity, filter;
+  transform: scale(0.96);
+  filter: drop-shadow(0 24px 60px rgba(0, 0, 0, 0.4));
+  animation: logoFadeIn 1.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
+  will-change: transform, opacity;
 }
 
-@keyframes logoFocusIn {
-  0% { opacity: 0; transform: scale(1.07); filter: drop-shadow(0 24px 60px rgba(0, 0, 0, 0.4)) blur(22px); }
+@keyframes logoFadeIn {
+  0% { opacity: 0; transform: scale(0.96); }
   55% { opacity: 1; }
   100% { opacity: 1; transform: scale(1); filter: drop-shadow(0 24px 60px rgba(0, 0, 0, 0.4)) blur(0px); }
 }
@@ -665,7 +650,6 @@ html.js .divider.in-view { transform: scaleX(1); }
 
 @media (prefers-reduced-motion: reduce) {
   .logo-hero-img { opacity: 1; animation: none; transform: none; filter: drop-shadow(0 24px 60px rgba(0, 0, 0, 0.4)); }
-  .logo-reveal::after { display: none; }
   .scroll-cue { display: none; }
 }
 
