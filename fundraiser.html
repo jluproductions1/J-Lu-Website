@@ -245,6 +245,10 @@ p:last-child { margin-bottom: 0; }
 .logo-hero::before { top: 0; }
 .logo-hero::after { bottom: 0; }
 
+.count-up {
+  font-variant-numeric: tabular-nums;
+}
+
 .btn {
   display: inline-flex;
   align-items: center;
@@ -552,7 +556,7 @@ html.js .divider.in-view { transform: scaleX(1); }
     radial-gradient(1px 1px at 88% 10%, var(--gold-soft) 55%, transparent 56%),
     radial-gradient(1.6px 1.6px at 5% 75%, var(--gold) 55%, transparent 56%),
     radial-gradient(1px 1px at 32% 92%, var(--gold-soft) 55%, transparent 56%);
-  animation: sparkFadeIn 1.8s ease-out forwards, sparkTwinkleA 4.5s ease-in-out 1.8s infinite;
+  animation: sparkFadeIn 1.8s ease-out forwards, sparkTwinkleA 4.5s ease-in-out 1.8s infinite, sparkDrift 70s linear infinite;
 }
 .spark-field::before {
   content: "";
@@ -568,7 +572,7 @@ html.js .divider.in-view { transform: scaleX(1); }
     radial-gradient(1.6px 1.6px at 10% 12%, var(--gold-soft) 55%, transparent 56%),
     radial-gradient(1px 1px at 37% 72%, var(--gold) 55%, transparent 56%);
   opacity: 0;
-  animation: sparkFadeIn 2.4s ease-out 0.4s forwards, sparkTwinkleB 6s ease-in-out 2.8s infinite;
+  animation: sparkFadeIn 2.4s ease-out 0.4s forwards, sparkTwinkleB 6s ease-in-out 2.8s infinite, sparkDrift 95s linear infinite reverse;
 }
 @keyframes sparkFadeIn {
   to { opacity: 0.85; }
@@ -585,6 +589,167 @@ html.js .divider.in-view { transform: scaleX(1); }
   75% { opacity: 0.3; }
   100% { opacity: 0.6; }
 }
+@keyframes sparkDrift {
+  from { background-position: 0% 0%; }
+  to { background-position: 4% 3%; }
+}
+
+/* ---------------------------------------------------------------------- */
+/* Shooting stars — a rare gold streak arcing across a dark section.     */
+/* Spawned by JS (script.js), purely decorative, respects reduced motion.*/
+/* ---------------------------------------------------------------------- */
+.shooting-star {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--gold-soft);
+  box-shadow: 0 0 6px 1px var(--gold-soft);
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+}
+.shooting-star::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 100%;
+  width: 90px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-soft));
+  transform: translateY(-50%);
+}
+@keyframes shootingStarMove {
+  0% { opacity: 0; transform: translate(0, 0); }
+  8% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--sx, -260px), var(--sy, 140px)); }
+}
+.shooting-star.is-active {
+  animation: shootingStarMove 1.6s cubic-bezier(0.3, 0, 0.2, 1) forwards;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Cursor sparkle — tiny sparks spawned near the pointer over dark        */
+/* sections. Desktop-only in practice (no mousemove on touch); purely     */
+/* decorative and cheap to skip.                                          */
+/* ---------------------------------------------------------------------- */
+.cursor-spark {
+  position: fixed;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--gold-soft);
+  box-shadow: 0 0 5px 1px var(--gold-soft);
+  pointer-events: none;
+  z-index: 999;
+  opacity: 0.9;
+  animation: cursorSparkFade 0.9s ease-out forwards;
+}
+@keyframes cursorSparkFade {
+  to { opacity: 0; transform: scale(0.3) translateY(10px); }
+}
+
+/* ---------------------------------------------------------------------- */
+/* Constellation lines — faint gold lines drawing themselves between      */
+/* nearby sparks when a dark section scrolls into view.                   */
+/* ---------------------------------------------------------------------- */
+.constellation-svg {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  width: 100%;
+  height: 100%;
+}
+.constellation-svg line {
+  stroke: var(--gold-soft);
+  stroke-width: 1;
+  fill: none;
+  stroke-dasharray: 240;
+  stroke-dashoffset: 240;
+  opacity: 0;
+  transition: stroke-dashoffset 2.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 1.5s ease;
+}
+html.js .constellation-svg.in-view line {
+  stroke-dashoffset: 0;
+  opacity: 0.5;
+}
+html.js .constellation-svg.in-view.is-settled line {
+  opacity: 0.16;
+  transition: opacity 3s ease;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Word-by-word headline reveal — each word arrives in a quick stagger,   */
+/* like subtitles resolving into focus. Visible immediately without JS.   */
+/* ---------------------------------------------------------------------- */
+.word-reveal .word {
+  display: inline-block;
+  opacity: 1;
+}
+html.js .word-reveal .word {
+  opacity: 0;
+  filter: blur(8px);
+  transform: translateY(10px);
+  animation: wordIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: calc(0.12s + var(--w, 0) * 0.07s);
+}
+@keyframes wordIn {
+  to { opacity: 1; filter: blur(0); transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  html.js .word-reveal .word { opacity: 1; filter: none; transform: none; animation: none; }
+}
+
+/* ---------------------------------------------------------------------- */
+/* Constellation timeline (About page) — a gold line draws down the       */
+/* left edge connecting each milestone as the block scrolls into view.    */
+/* ---------------------------------------------------------------------- */
+.constellation-timeline {
+  position: relative;
+  padding-left: 28px;
+}
+.constellation-timeline::before {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 10px;
+  bottom: 10px;
+  width: 1px;
+  background: linear-gradient(180deg, var(--gold), var(--gold-soft));
+  transform-origin: top center;
+  transform: scaleY(0);
+  transition: transform 1.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+html.js .constellation-timeline.in-view::before {
+  transform: scaleY(1);
+}
+.constellation-timeline:not(.in-view)::before,
+html:not(.js) .constellation-timeline::before {
+  transform: scaleY(1);
+}
+.timeline-row {
+  position: relative;
+}
+.timeline-row::before {
+  content: "";
+  position: absolute;
+  left: -28px;
+  top: 1.9rem;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--gold-soft);
+  box-shadow: 0 0 6px 1px rgba(234, 191, 83, 0.6);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+html.js .constellation-timeline.in-view .timeline-row::before {
+  opacity: 1;
+  transition: opacity 0.5s ease var(--dot-delay, 0s);
+}
+html:not(.js) .timeline-row::before { opacity: 1; }
 
 /* Glint stars — a few larger four-point sparkles at fixed angles, each   */
 /* catching the "light" on its own rhythm for extra shimmer.             */
@@ -691,7 +856,7 @@ html.js .divider.in-view { transform: scaleX(1); }
   </div>
   <div class="container reveal focus-in">
     <p class="eyebrow eyebrow--on-dark">Fundraiser</p>
-    <h1 style="font-size:clamp(2.2rem, 5vw, 3.6rem); color:#fff; max-width:18ch; line-height:1.1;">Support Faith-Centered Storytelling</h1>
+    <h1 class="word-reveal" style="font-size:clamp(2.2rem, 5vw, 3.6rem); color:#fff; max-width:18ch; line-height:1.1;">Support Faith-Centered Storytelling</h1>
     <p style="color:var(--muted-on-dark); max-width:52ch; margin-top:1.2rem; font-size:1.1rem;">Help provide the tools behind J-Lu Productions' next chapter of faith-rooted film.</p>
   </div>
 </header>
@@ -702,7 +867,7 @@ html.js .divider.in-view { transform: scaleX(1); }
       <div class="reveal">
         <div class="card" style="position:sticky; top:6.5rem;">
           <p class="eyebrow" style="margin-bottom:1.2rem;">Progress</p>
-          <p style="font-family:var(--font-display); font-size:2.4rem; margin-bottom:0.2rem;">$375 <span style="font-size:1.1rem; color:var(--muted); font-family:var(--font-body);">of $8,000</span></p>
+          <p style="font-family:var(--font-display); font-size:2.4rem; margin-bottom:0.2rem;"><span class="count-up" data-count-target="375" data-count-prefix="$">$375</span> <span style="font-size:1.1rem; color:var(--muted); font-family:var(--font-body);">of $8,000</span></p>
           <div style="height:8px; background:var(--parchment-deep); border-radius:99px; overflow:hidden; margin:1.2rem 0;">
             <div class="progress-fill" style="--w:5%; height:100%; background:var(--gold);"></div>
           </div>
@@ -792,6 +957,30 @@ html.js .divider.in-view { transform: scaleX(1); }
 </footer>
 
 <script>
+// Counting-up numbers: animates a numeric text node from 0 to its target
+// value. Reads the target from data-count-target; falls back to the
+// element's existing text (already correct) if anything goes wrong.
+function animateCountUp(el) {
+  try {
+    const target = parseInt(el.getAttribute("data-count-target"), 10);
+    if (!Number.isFinite(target)) return;
+    const prefix = el.getAttribute("data-count-prefix") || "";
+    const duration = 1500;
+    const start = performance.now();
+
+    const step = (now) => {
+      const progress = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const value = Math.round(target * eased);
+      el.textContent = prefix + value.toLocaleString();
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  } catch (err) {
+    // leave the static fallback text in place
+  }
+}
+
 // Nav solid-on-scroll
 const nav = document.querySelector(".site-nav");
 const setNavState = () => {
@@ -824,8 +1013,44 @@ if (toggle && links) {
 /* IntersectionObserver isn't supported, or anything throws, nothing on */
 /* the page is ever left permanently invisible.                        */
 /* -------------------------------------------------------------------- */
+/* -------------------------------------------------------------------- */
+/* Constellation lines — injects a small SVG of connecting lines into    */
+/* each spark-field host. Reveal timing is handled by the shared         */
+/* IntersectionObserver in initReveal (targets ".constellation-svg").    */
+/* -------------------------------------------------------------------- */
+(function initConstellations() {
+  const hosts = document.querySelectorAll(".spark-field");
+  const patterns = [
+    [[8, 22, 27, 12], [27, 12, 44, 5], [61, 60, 78, 50], [78, 50, 92, 25]],
+    [[14, 55, 10, 12], [42, 22, 55, 88], [80, 68, 95, 42]],
+  ];
+
+  hosts.forEach((host, i) => {
+    const pattern = patterns[i % patterns.length];
+    const svgNS = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("class", "constellation-svg");
+    svg.setAttribute("preserveAspectRatio", "none");
+    svg.setAttribute("viewBox", "0 0 100 100");
+
+    pattern.forEach(([x1, y1, x2, y2]) => {
+      const line = document.createElementNS(svgNS, "line");
+      line.setAttribute("x1", x1);
+      line.setAttribute("y1", y1);
+      line.setAttribute("x2", x2);
+      line.setAttribute("y2", y2);
+      line.setAttribute("vector-effect", "non-scaling-stroke");
+      svg.appendChild(line);
+    });
+
+    host.appendChild(svg);
+  });
+})();
+
 (function initReveal() {
-  const targets = document.querySelectorAll(".reveal, .progress-fill, .divider");
+  const targets = document.querySelectorAll(
+    ".reveal, .progress-fill, .divider, .constellation-svg, .constellation-timeline, .count-up"
+  );
   if (!targets.length) return;
 
   const revealAll = () => targets.forEach((el) => el.classList.add("in-view"));
@@ -840,8 +1065,15 @@ if (toggle && links) {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            entry.target.classList.add("in-view");
-            io.unobserve(entry.target);
+            const el = entry.target;
+            el.classList.add("in-view");
+            if (el.classList.contains("constellation-svg")) {
+              setTimeout(() => el.classList.add("is-settled"), 3600);
+            }
+            if (el.classList.contains("count-up")) {
+              animateCountUp(el);
+            }
+            io.unobserve(el);
           }
         });
       },
@@ -926,6 +1158,100 @@ if (toggle && links) {
   update();
   window.addEventListener("scroll", onScroll, { passive: true });
   window.addEventListener("resize", onScroll);
+})();
+
+/* -------------------------------------------------------------------- */
+/* Word-by-word headline reveal — wraps each word of .word-reveal        */
+/* headings in a span so CSS can stagger them in. If this never runs,   */
+/* the heading's plain text stays fully visible (see styles.css).       */
+/* -------------------------------------------------------------------- */
+(function initWordReveal() {
+  const heads = document.querySelectorAll(".word-reveal");
+  heads.forEach((head) => {
+    const words = head.textContent.trim().split(/\s+/);
+    head.innerHTML = words
+      .map((w, i) => `<span class="word" style="--w:${i}">${w}</span>`)
+      .join(" ");
+  });
+})();
+
+/* -------------------------------------------------------------------- */
+/* Shooting stars — a rare gold streak arcing across a random dark       */
+/* section. Purely decorative; skipped for reduced motion.               */
+/* -------------------------------------------------------------------- */
+(function initShootingStars() {
+  const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const hosts = document.querySelectorAll(".logo-hero, .letterbox");
+  if (prefersReduced || !hosts.length) return;
+
+  const spawn = () => {
+    const visibleHosts = Array.from(hosts).filter((h) => {
+      const r = h.getBoundingClientRect();
+      return r.bottom > 0 && r.top < window.innerHeight;
+    });
+    if (!visibleHosts.length) return;
+
+    const host = visibleHosts[Math.floor(Math.random() * visibleHosts.length)];
+    if (getComputedStyle(host).position === "static") return;
+
+    const star = document.createElement("span");
+    star.className = "shooting-star";
+    const startX = 20 + Math.random() * 60;
+    const startY = 10 + Math.random() * 40;
+    const dx = -(180 + Math.random() * 160);
+    const dy = 80 + Math.random() * 100;
+    star.style.left = startX + "%";
+    star.style.top = startY + "%";
+    star.style.setProperty("--sx", dx + "px");
+    star.style.setProperty("--sy", dy + "px");
+    host.appendChild(star);
+
+    requestAnimationFrame(() => star.classList.add("is-active"));
+    setTimeout(() => star.remove(), 2000);
+  };
+
+  const scheduleNext = () => {
+    const delay = 6000 + Math.random() * 9000;
+    setTimeout(() => {
+      spawn();
+      scheduleNext();
+    }, delay);
+  };
+
+  scheduleNext();
+})();
+
+/* -------------------------------------------------------------------- */
+/* Cursor sparkle — tiny sparks trailing the pointer over dark sections. */
+/* Heavily throttled; no-op on touch devices (no mousemove events).      */
+/* -------------------------------------------------------------------- */
+(function initCursorSparkle() {
+  const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (prefersReduced) return;
+
+  let lastSpawn = 0;
+  const minGap = 140;
+
+  document.addEventListener(
+    "mousemove",
+    (e) => {
+      const now = performance.now();
+      if (now - lastSpawn < minGap) return;
+
+      const el = document.elementFromPoint(e.clientX, e.clientY);
+      if (!el || !el.closest(".logo-hero, .letterbox")) return;
+      if (Math.random() > 0.35) return; // sparse, not a full trail
+
+      lastSpawn = now;
+      const spark = document.createElement("span");
+      spark.className = "cursor-spark";
+      spark.style.left = e.clientX + "px";
+      spark.style.top = e.clientY + "px";
+      document.body.appendChild(spark);
+      setTimeout(() => spark.remove(), 950);
+    },
+    { passive: true }
+  );
 })();
 
 </script>
