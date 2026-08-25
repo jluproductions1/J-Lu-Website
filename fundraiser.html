@@ -420,6 +420,22 @@ html.js .progress-fill.in-view { width: var(--w, 0%); }
 /* Hover micro-interactions                                               */
 /* ---------------------------------------------------------------------- */
 
+.video-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: var(--navy-deep);
+  overflow: hidden;
+  border-radius: var(--radius);
+}
+.video-frame iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
 .card, a.card {
   display: block;
   transition: transform 0.4s cubic-bezier(0.22, 0.61, 0.36, 1), box-shadow 0.4s ease;
@@ -830,6 +846,16 @@ html:not(.js) .timeline-row::before { opacity: 1; }
     <p style="color:var(--muted-on-dark); max-width:52ch; margin-top:1.2rem; font-size:1.1rem;">Help provide the tools behind J-Lu Productions' next chapter of faith-rooted film.</p>
   </div>
 </header>
+
+<section>
+  <div class="container reveal">
+    <p class="eyebrow">Watch</p>
+    <h2 style="font-size:clamp(1.6rem, 2.8vw, 2.2rem); margin-bottom:1.5rem;">See the mission firsthand</h2>
+    <div class="video-frame">
+      <iframe src="https://www.youtube.com/embed/slkL5ld9ltU" title="Support Faith-Centered Storytelling — Fundraiser Video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
+    </div>
+  </div>
+</section>
 
 <section>
   <div class="container">
